@@ -1,273 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnFlow LMS — ER Diagram (All 15 Tables)</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<div id="erd" style="padding: 1rem; background: #050D2A; border-radius: 12px; min-height: 400px;"></div>
-<style>
-body, html { background: #050D2A; }
-#erd svg { max-width: 100%; background: transparent !important; }
+    body, html {
+      background: #050D2A;
+      font-family: 'Courier New', monospace;
+      color: #B0C4DE;
+      min-height: 100vh;
+    }
 
-#erd svg .er { background: transparent !important; }
+    /* ── PAGE HEADER ─────────────────────────────────────────────────────── */
+    .page-header {
+      padding: 28px 40px 16px 40px;
+      border-bottom: 1px solid #0F1F40;
+    }
+    .page-tag {
+      font-size: 11px;
+      font-weight: bold;
+      color: #1E4DB7;
+      letter-spacing: 3px;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 8px;
+    }
+    .page-title {
+      font-size: 30px;
+      font-weight: bold;
+      color: #FFFFFF;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 6px;
+    }
+    .page-subtitle {
+      font-size: 12px;
+      color: #475569;
+      font-family: 'Courier New', monospace;
+    }
 
-#erd svg text { fill: #B0C4DE !important; font-family: 'Courier New', monospace !important; }
+    /* ── LEGEND ─────────────────────────────────────────────────────────── */
+    .legend {
+      display: flex;
+      gap: 28px;
+      padding: 10px 40px;
+      background: #080F20;
+      border-bottom: 1px solid #0F1F40;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .legend-title {
+      font-size: 10px;
+      color: #334155;
+      letter-spacing: 2px;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      color: #64748B;
+      font-family: 'Courier New', monospace;
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .legend-badge {
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
 
-#erd svg .entityBox, 
-#erd svg rect.er { 
-  fill: #0A1F5A !important; 
-  stroke: #1E4DB7 !important; 
-  stroke-width: 1.5px !important;
-}
+    /* ── TABLE GROUPS ────────────────────────────────────────────────────── */
+    .group-bar {
+      display: flex;
+      gap: 10px;
+      padding: 10px 40px;
+      background: #060E22;
+      border-bottom: 1px solid #0F1F40;
+      flex-wrap: wrap;
+    }
+    .group-chip {
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      letter-spacing: 1px;
+      border: 1px solid;
+    }
 
-#erd svg .attributeBoxOdd rect,
-#erd svg .row-rect-odd rect,
-#erd svg .row-rect-odd path {
-  fill: #0D2260 !important;
-  stroke: none !important;
-}
+    /* ── ERD CONTAINER ───────────────────────────────────────────────────── */
+    #erd {
+      padding: 28px 20px;
+      background: transparent;
+      overflow-x: auto;
+      min-height: 500px;
+    }
+    #erd svg {
+      background: transparent !important;
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+    }
 
-#erd svg .attributeBoxEven rect,
-#erd svg .row-rect-even rect,
-#erd svg .row-rect-even path {
-  fill: #091B50 !important;
-  stroke: none !important;
-}
+    /* ── MERMAID STYLE OVERRIDES ─────────────────────────────────────────── */
+    #erd svg text {
+      fill: #B0C4DE !important;
+      font-family: 'Courier New', monospace !important;
+    }
+    #erd svg .entityBox,
+    #erd svg rect.er {
+      fill: #0A1F5A !important;
+      stroke: #1E4DB7 !important;
+      stroke-width: 1.5px !important;
+    }
+    #erd svg .attributeBoxOdd rect,
+    #erd svg .row-rect-odd rect,
+    #erd svg .row-rect-odd path {
+      fill: #0D2260 !important;
+      stroke: none !important;
+    }
+    #erd svg .attributeBoxEven rect,
+    #erd svg .row-rect-even rect,
+    #erd svg .row-rect-even path {
+      fill: #091B50 !important;
+      stroke: none !important;
+    }
+    #erd svg .entityLabel text,
+    #erd svg .er.entityLabel,
+    #erd svg .er.entityHeadingLabel text {
+      fill: #FFFFFF !important;
+      font-weight: bold !important;
+    }
+    #erd svg path.er,
+    #erd svg line.er {
+      stroke: #2A5ABF !important;
+      stroke-width: 1.5px !important;
+    }
+    #erd svg .er.relationshipLabel {
+      fill: #42A5F5 !important;
+    }
+    #erd svg .er.relationshipLabelBox {
+      fill: #050D2A !important;
+      stroke: none !important;
+      opacity: 0.85 !important;
+    }
+    #erd svg marker path {
+      stroke: #2A5ABF !important;
+      fill: #2A5ABF !important;
+    }
+    #erd svg .er.attributeBoxEven text,
+    #erd svg .er.attributeBoxOdd text {
+      fill: #B0C4DE !important;
+    }
+    #erd svg .er[class*="PK"],
+    #erd svg text[class*="PK"] {
+      fill: #F0C060 !important;
+      font-weight: bold !important;
+    }
+    #erd svg .er[class*="FK"],
+    #erd svg text[class*="FK"] {
+      fill: #02C39A !important;
+    }
 
-#erd svg .entityLabel text,
-#erd svg .er.entityLabel { 
-  fill: #FFFFFF !important; 
-  font-weight: bold !important;
-}
+    /* ── FOOTER ──────────────────────────────────────────────────────────── */
+    .page-footer {
+      padding: 12px 40px;
+      border-top: 1px solid #0F1F40;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #1E3A5F;
+      font-family: 'Courier New', monospace;
+      background: #060E22;
+    }
+    .footer-badge {
+      background: #0A1628;
+      border: 1px solid #1E3A5F;
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 11px;
+      color: #42A5F5;
+    }
+  </style>
+</head>
+<body>
 
-#erd svg .er.entityHeadingLabel text {
-  fill: #FFFFFF !important;
-  font-weight: bold !important;
-}
+  <!-- ── HEADER ──────────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="page-tag">04  DATABASE SCHEMA</div>
+    <div class="page-title">Entity Relationship Diagram</div>
+    <div class="page-subtitle">
+      All 15 tables · Every field · PKs (gold) · FKs (teal) · Crow's foot notation · RLS enforced on every table
+    </div>
+  </div>
 
-#erd svg path.er,
-#erd svg line.er { 
-  stroke: #2A5ABF !important; 
-  stroke-width: 1.5px !important;
-}
+  <!-- ── LEGEND ──────────────────────────────────────────────────────────── -->
+  <div class="legend">
+    <span class="legend-title">LEGEND</span>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#F0C060"></div>
+      PK — Primary Key (UUID)
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#02C39A"></div>
+      FK — Foreign Key
+    </div>
+    <div class="legend-item">
+      <span class="legend-badge" style="color:#42A5F5;background:#0A1628;border:1px solid #1E3A5F">||</span>
+      Exactly one
+    </div>
+    <div class="legend-item">
+      <span class="legend-badge" style="color:#42A5F5;background:#0A1628;border:1px solid #1E3A5F">|o</span>
+      Zero or one
+    </div>
+    <div class="legend-item">
+      <span class="legend-badge" style="color:#42A5F5;background:#0A1628;border:1px solid #1E3A5F">}o</span>
+      Zero or many
+    </div>
+    <div class="legend-item">
+      <span class="legend-badge" style="color:#42A5F5;background:#0A1628;border:1px solid #1E3A5F">}|</span>
+      One or many (mandatory)
+    </div>
+  </div>
 
-#erd svg .er.relationshipLabel { 
-  fill: #42A5F5 !important; 
-  background: #050D2A !important;
-}
+  <!-- ── GROUP CHIPS ─────────────────────────────────────────────────────── -->
+  <div class="group-bar">
+    <span class="group-chip" style="color:#60A5FA;border-color:#1E3A5F;background:#071530">👤 Users & Auth</span>
+    <span class="group-chip" style="color:#34D399;border-color:#064E3B;background:#031A10">📚 Course Content</span>
+    <span class="group-chip" style="color:#FBBF24;border-color:#78350F;background:#1A0E00">📋 Enrollment & Progress</span>
+    <span class="group-chip" style="color:#F97316;border-color:#7C2D12;background:#1A0900">🧩 Quiz System</span>
+    <span class="group-chip" style="color:#A78BFA;border-color:#4C1D95;background:#0D0820">📝 Assignment System</span>
+  </div>
 
-#erd svg .er.relationshipLabelBox {
-  fill: #050D2A !important;
-  stroke: none !important;
-  opacity: 0.85 !important;
-}
+  <!-- ── ERD ─────────────────────────────────────────────────────────────── -->
+  <div id="erd"></div>
 
-#erd svg marker path {
-  stroke: #2A5ABF !important;
-  fill: #2A5ABF !important;
-}
+  <!-- ── FOOTER ──────────────────────────────────────────────────────────── -->
+  <div class="page-footer">
+    <span>LearnFlow LMS · Data Structure &amp; Flow Document v1.0</span>
+    <span class="footer-badge">15 Tables · All PKs UUID · CASCADE on delete where appropriate · RLS on all</span>
+    <span>04</span>
+  </div>
 
-#erd svg .er.attributeBoxEven text,
-#erd svg .er.attributeBoxOdd text {
-  fill: #B0C4DE !important;
-}
+  <script type="module">
+    import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+    await document.fonts.ready;
 
-#erd svg .er[class*="type-"] { fill: #42A5F5 !important; }
-#erd svg .er[class*="PK"],
-#erd svg text[class*="PK"] { fill: #F0C060 !important; font-weight: bold !important; }
-#erd svg .er[class*="FK"],
-#erd svg text[class*="FK"] { fill: #02C39A !important; }
-</style>
-<script type="module">
-import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
-await document.fonts.ready;
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'base',
-  fontFamily: '"Courier New", monospace',
-  themeVariables: {
-    darkMode: true,
-    fontSize: '13px',
-    fontFamily: '"Courier New", monospace',
-    primaryColor: '#0A1F5A',
-    primaryTextColor: '#FFFFFF',
-    primaryBorderColor: '#1E4DB7',
-    secondaryColor: '#0D2260',
-    tertiaryColor: '#091B50',
-    lineColor: '#2A5ABF',
-    textColor: '#B0C4DE',
-    edgeLabelBackground: '#050D2A',
-    attributeBackgroundColorOdd: '#0D2260',
-    attributeBackgroundColorEven: '#091B50',
-    nodeBorder: '#1E4DB7',
-    clusterBkg: '#0A1F5A',
-    titleColor: '#FFFFFF',
-    relationLabelColor: '#42A5F5',
-  },
-});
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      fontFamily: '"Courier New", monospace',
+      er: {
+        diagramPadding: 40,
+        layoutDirection: 'TB',
+        minEntityWidth: 120,
+        minEntityHeight: 80,
+        entityPadding: 18,
+        useMaxWidth: true,
+      },
+      themeVariables: {
+        darkMode: true,
+        fontSize: '12px',
+        fontFamily: '"Courier New", monospace',
+        primaryColor: '#0A1F5A',
+        primaryTextColor: '#FFFFFF',
+        primaryBorderColor: '#1E4DB7',
+        secondaryColor: '#0D2260',
+        tertiaryColor: '#091B50',
+        lineColor: '#2A5ABF',
+        textColor: '#B0C4DE',
+        edgeLabelBackground: '#050D2A',
+        attributeBackgroundColorOdd: '#0D2260',
+        attributeBackgroundColorEven: '#091B50',
+        nodeBorder: '#1E4DB7',
+        clusterBkg: '#0A1F5A',
+        titleColor: '#FFFFFF',
+        relationLabelColor: '#42A5F5',
+      },
+    });
 
-const diagram = `erDiagram
-  users ||--o{ enrollments : enrolls
-  users ||--o{ course_progress : tracks
-  users ||--o{ quiz_attempts : takes
-  users ||--o{ notifications : receives
-  users ||--o{ certificates : earns
-  users ||--o{ forum_posts : writes
-  courses ||--o{ enrollments : has
-  courses ||--o{ sections : contains
-  courses ||--o{ certificates : issues
-  sections ||--o{ lessons : has
-  lessons ||--o{ course_progress : tracked_by
-  lessons ||--o{ lesson_files : has
-  quizzes ||--o{ quiz_questions : has
-  quizzes ||--o{ quiz_attempts : attempted_in
-  quiz_attempts ||--o{ quiz_answers : includes
-  quiz_questions ||--o{ quiz_answers : answered_by
+    const diagram = `erDiagram
+
+  %% ═══════════════════════════════════════════════════════════════
+  %% GROUP 1 — USERS & AUTH
+  %% ═══════════════════════════════════════════════════════════════
+  institutions ||--o{ users : "belongs_to"
+  users ||--o{ parent_child_links : "is_parent"
+  users ||--o{ parent_child_links : "is_child"
+
+  %% ═══════════════════════════════════════════════════════════════
+  %% GROUP 2 — COURSE CONTENT HIERARCHY
+  %% ═══════════════════════════════════════════════════════════════
+  users ||--o{ courses : "instructs"
+  institutions ||--o{ courses : "owns"
+  courses ||--o{ sections : "contains"
+  sections ||--o{ lessons : "has"
+  lessons ||--o{ lesson_files : "has"
+
+  %% ═══════════════════════════════════════════════════════════════
+  %% GROUP 3 — ENROLLMENT & PROGRESS
+  %% ═══════════════════════════════════════════════════════════════
+  users ||--o{ enrollments : "enrolls_in"
+  courses ||--o{ enrollments : "enrolled_by"
+  users ||--o{ course_progress : "has_progress"
+  lessons ||--o{ course_progress : "tracked_via"
+  courses ||--o{ course_progress : "progress_in"
+
+  %% ═══════════════════════════════════════════════════════════════
+  %% GROUP 4 — QUIZ SYSTEM
+  %% ═══════════════════════════════════════════════════════════════
+  lessons ||--o| quizzes : "has_quiz"
+  quizzes ||--o{ quiz_questions : "contains"
+  quizzes ||--o{ quiz_attempts : "attempted_in"
+  users ||--o{ quiz_attempts : "takes"
+  quiz_attempts ||--o{ quiz_answers : "includes"
+  quiz_questions ||--o{ quiz_answers : "answered_by"
+
+  %% ═══════════════════════════════════════════════════════════════
+  %% GROUP 5 — ASSIGNMENT SYSTEM
+  %% ═══════════════════════════════════════════════════════════════
+  lessons ||--o| assignments : "has_assignment"
+  assignments ||--o{ assignment_submissions : "submitted_via"
+  users ||--o{ assignment_submissions : "submits"
+  users ||--o{ assignment_submissions : "grades"
+
+  %% ═══════════════════════════════════════════════════════════════
+  %% TABLE DEFINITIONS — all 15 tables, every field
+  %% ═══════════════════════════════════════════════════════════════
+
+  institutions {
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    varchar name "NOT NULL"
+    varchar slug "UNIQUE NOT NULL"
+    text logo_url "NULLABLE"
+    boolean is_active "DEFAULT true"
+    timestamptz created_at "DEFAULT NOW()"
+  }
 
   users {
-    uuid id PK
-    string full_name
-    string email
-    string role
-    string avatar_url
-    timestamp created_at
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid supabase_uid "UNIQUE NOT NULL REFERENCES auth.users"
+    varchar email "UNIQUE NOT NULL"
+    varchar full_name "NOT NULL"
+    text avatar_url "Cloudinary URL - NULLABLE"
+    varchar role "student|teacher|parent|institution_admin|super_admin"
+    uuid institution_id FK "REFERENCES institutions(id) ON DELETE SET NULL"
+    boolean is_active "DEFAULT true"
+    timestamptz created_at "DEFAULT NOW()"
+    timestamptz updated_at "DEFAULT NOW()"
   }
+
+  parent_child_links {
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid parent_id FK "NOT NULL REFERENCES users(id) ON DELETE CASCADE"
+    uuid child_id FK "NOT NULL REFERENCES users(id) ON DELETE CASCADE"
+    timestamptz created_at "DEFAULT NOW()"
+  }
+
   courses {
-    uuid id PK
-    uuid instructor_id FK
-    string title
-    string description
-    string thumbnail_url
-    string status
-    decimal price
-    timestamp created_at
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid instructor_id FK "NOT NULL REFERENCES users(id)"
+    uuid institution_id FK "REFERENCES institutions(id)"
+    varchar title "NOT NULL"
+    varchar slug "UNIQUE NOT NULL"
+    text description "NULLABLE"
+    text thumbnail_url "Cloudinary URL"
+    decimal price "DECIMAL(10,2) DEFAULT 0.00"
+    varchar difficulty "beginner|intermediate|advanced"
+    varchar status "DEFAULT draft - draft|published|archived"
+    timestamptz created_at "DEFAULT NOW()"
+    timestamptz updated_at "DEFAULT NOW()"
   }
+
   sections {
-    uuid id PK
-    uuid course_id FK
-    string title
-    int order_index
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid course_id FK "NOT NULL REFERENCES courses(id) ON DELETE CASCADE"
+    varchar title "NOT NULL"
+    int order_index "NOT NULL"
+    timestamptz created_at "DEFAULT NOW()"
   }
+
   lessons {
-    uuid id PK
-    uuid section_id FK
-    string title
-    string type
-    string video_url
-    text content
-    int duration_secs
-    int order_index
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid section_id FK "NOT NULL REFERENCES sections(id) ON DELETE CASCADE"
+    varchar title "NOT NULL"
+    varchar type "video|quiz|assignment|text"
+    text video_s3_key "raw S3 key - signed URL generated per request"
+    int duration_secs "NULLABLE"
+    int order_index "NOT NULL"
+    boolean is_preview "DEFAULT false"
+    timestamptz created_at "DEFAULT NOW()"
   }
+
   lesson_files {
-    uuid id PK
-    uuid lesson_id FK
-    string file_name
-    string file_url
-    string file_type
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid lesson_id FK "NOT NULL REFERENCES lessons(id) ON DELETE CASCADE"
+    varchar file_name "NOT NULL"
+    text s3_key "NOT NULL - raw S3 key"
+    varchar file_type "pdf|ppt|zip|image"
+    int file_size "bytes - NULLABLE"
+    timestamptz created_at "DEFAULT NOW()"
   }
+
   enrollments {
-    uuid id PK
-    uuid user_id FK
-    uuid course_id FK
-    string status
-    timestamp enrolled_at
-    timestamp completed_at
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid user_id FK "NOT NULL REFERENCES users(id) ON DELETE CASCADE"
+    uuid course_id FK "NOT NULL REFERENCES courses(id) ON DELETE CASCADE"
+    varchar status "pending|active|expired|refunded"
+    text razorpay_order_id "NULLABLE"
+    timestamptz enrolled_at "SET when status becomes active"
+    timestamptz expires_at "NULL means lifetime access"
+    timestamptz created_at "DEFAULT NOW()"
   }
+
   course_progress {
-    uuid id PK
-    uuid user_id FK
-    uuid lesson_id FK
-    boolean is_completed
-    int watched_secs
-    timestamp last_accessed
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid user_id FK "NOT NULL REFERENCES users(id) ON DELETE CASCADE"
+    uuid lesson_id FK "NOT NULL REFERENCES lessons(id) ON DELETE CASCADE"
+    uuid course_id FK "NOT NULL REFERENCES courses(id)"
+    int watched_secs "DEFAULT 0"
+    decimal watched_pct "DECIMAL(5,2) DEFAULT 0.00"
+    boolean is_completed "DEFAULT false - true when watched_pct >= 90"
+    timestamptz completed_at "SET when is_completed = true"
+    timestamptz updated_at "DEFAULT NOW()"
   }
+
   quizzes {
-    uuid id PK
-    uuid lesson_id FK
-    string title
-    int pass_score
-    int time_limit_secs
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid lesson_id FK "UNIQUE NOT NULL REFERENCES lessons(id)"
+    varchar title "NOT NULL"
+    int time_limit_secs "DEFAULT 3600"
+    int pass_pct "DEFAULT 60 - minimum pass percentage"
+    int max_attempts "DEFAULT 3"
+    timestamptz created_at "DEFAULT NOW()"
   }
+
   quiz_questions {
-    uuid id PK
-    uuid quiz_id FK
-    string question_text
-    string type
-    json options
-    string correct_answer
-    int marks
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid quiz_id FK "NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE"
+    text question_text "NOT NULL - markdown / LaTeX supported"
+    text option_a "NOT NULL"
+    text option_b "NOT NULL"
+    text option_c "NULLABLE"
+    text option_d "NULLABLE"
+    varchar correct_answer "CHECK IN (a|b|c|d) - NEVER sent to client"
+    int marks "DEFAULT 1"
+    int order_index "NOT NULL"
   }
+
   quiz_attempts {
-    uuid id PK
-    uuid quiz_id FK
-    uuid user_id FK
-    int score
-    boolean passed
-    timestamp attempted_at
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid quiz_id FK "NOT NULL REFERENCES quizzes(id)"
+    uuid user_id FK "NOT NULL REFERENCES users(id)"
+    int score "DEFAULT 0"
+    int total_marks "NOT NULL"
+    boolean pass_status "DEFAULT false"
+    timestamptz started_at "NOT NULL"
+    timestamptz submitted_at "NULLABLE"
+    int time_taken "seconds - NULLABLE"
+    int attempt_no "DEFAULT 1"
+    timestamptz created_at "DEFAULT NOW()"
   }
+
   quiz_answers {
-    uuid id PK
-    uuid attempt_id FK
-    uuid question_id FK
-    string given_answer
-    boolean is_correct
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid attempt_id FK "NOT NULL REFERENCES quiz_attempts(id) ON DELETE CASCADE"
+    uuid question_id FK "NOT NULL REFERENCES quiz_questions(id)"
+    varchar given_answer "CHECK IN (a|b|c|d) - NULLABLE if skipped"
+    boolean is_correct "NOT NULL - computed server-side"
+    int marks_awarded "DEFAULT 0 - partial marks supported"
+    timestamptz created_at "DEFAULT NOW()"
   }
-  certificates {
-    uuid id PK
-    uuid user_id FK
-    uuid course_id FK
-    string cert_url
-    timestamp issued_at
+
+  assignments {
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid lesson_id FK "UNIQUE NOT NULL REFERENCES lessons(id)"
+    varchar title "NOT NULL"
+    text description "markdown - what to do"
+    timestamptz due_date "NULLABLE"
+    int max_marks "DEFAULT 100"
+    varchar submission_type "file|text|link"
+    timestamptz created_at "DEFAULT NOW()"
   }
-  notifications {
-    uuid id PK
-    uuid user_id FK
-    string type
-    string message
-    boolean is_read
-    timestamp created_at
-  }
-  forum_posts {
-    uuid id PK
-    uuid user_id FK
-    uuid lesson_id FK
-    uuid parent_id FK
-    text content
-    timestamp created_at
+
+  assignment_submissions {
+    uuid id PK "PRIMARY KEY DEFAULT gen_random_uuid()"
+    uuid assignment_id FK "NOT NULL REFERENCES assignments(id)"
+    uuid student_id FK "NOT NULL REFERENCES users(id)"
+    text file_s3_key "S3 key for uploaded file"
+    text text_content "NULLABLE - if submission_type = text"
+    timestamptz submitted_at "DEFAULT NOW()"
+    int grade "marks awarded by teacher - NULLABLE"
+    text feedback "teacher written feedback - NULLABLE"
+    timestamptz graded_at "NULLABLE"
+    uuid graded_by FK "REFERENCES users(id) - NULLABLE"
+    varchar status "DEFAULT submitted - submitted|graded|returned"
   }
 `;
 
-const { svg } = await mermaid.render('erd-svg', diagram);
-document.getElementById('erd').innerHTML = svg;
+    try {
+      const { svg } = await mermaid.render('erd-svg', diagram);
+      document.getElementById('erd').innerHTML = svg;
 
-document.querySelectorAll('#erd svg.erDiagram .node').forEach(node => {
-  const firstPath = node.querySelector('path[d]');
-  if (!firstPath) return;
-  const d = firstPath.getAttribute('d');
-  const nums = d.match(/-?[\d.]+/g)?.map(Number);
-  if (!nums || nums.length < 8) return;
-  const xs = [nums[0], nums[2], nums[4], nums[6]];
-  const ys = [nums[1], nums[3], nums[5], nums[7]];
-  const x = Math.min(...xs), y = Math.min(...ys);
-  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
-  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  rect.setAttribute('x', x); rect.setAttribute('y', y);
-  rect.setAttribute('width', w); rect.setAttribute('height', h);
-  rect.setAttribute('rx', '8');
-  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
-    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
-  }
-  firstPath.replaceWith(rect);
-});
+      // ── POST-RENDER STYLE FIXES ──────────────────────────────────────────
+      const svgEl = document.querySelector('#erd svg');
+      if (svgEl) {
+        svgEl.style.background = 'transparent';
 
-document.querySelectorAll('#erd svg.erDiagram .row-rect-odd path, #erd svg.erDiagram .row-rect-even path').forEach(p => {
-  p.setAttribute('stroke', 'none');
-});
+        // Fix entity box fills
+        svgEl.querySelectorAll('.entityBox').forEach(box => {
+          box.style.fill = '#0A1F5A';
+          box.style.stroke = '#1E4DB7';
+          box.style.strokeWidth = '1.5px';
+        });
 
-const svgEl = document.querySelector('#erd svg');
-if (svgEl) {
-  svgEl.style.background = 'transparent';
-  svgEl.querySelectorAll('rect[class="er"]').forEach(r => {
-    r.style.fill = '#050D2A';
-  });
-  svgEl.querySelectorAll('.entityBox').forEach(box => {
-    box.style.fill = '#0A1F5A';
-    box.style.stroke = '#1E4DB7';
-  });
-}
-</script>
+        // Fix background rects
+        svgEl.querySelectorAll('rect[class="er"]').forEach(r => {
+          r.style.fill = '#050D2A';
+        });
+
+        // Convert path-based nodes to rounded rects
+        svgEl.querySelectorAll('.node').forEach(node => {
+          const firstPath = node.querySelector('path[d]');
+          if (!firstPath) return;
+          const d = firstPath.getAttribute('d');
+          const nums = d.match(/-?[\d.]+/g)?.map(Number);
+          if (!nums || nums.length < 8) return;
+          const xs = nums.filter((_, i) => i % 2 === 0);
+          const ys = nums.filter((_, i) => i % 2 === 1);
+          const x = Math.min(...xs), y = Math.min(...ys);
+          const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', x); rect.setAttribute('y', y);
+          rect.setAttribute('width', w); rect.setAttribute('height', h);
+          rect.setAttribute('rx', '8');
+          for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+            if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+          }
+          firstPath.replaceWith(rect);
+        });
+
+        // Remove strokes from row paths
+        svgEl.querySelectorAll(
+          '.row-rect-odd path, .row-rect-even path'
+        ).forEach(p => p.setAttribute('stroke', 'none'));
+      }
+    } catch (err) {
+      document.getElementById('erd').innerHTML =
+        '<p style="color:#F87171;padding:20px;font-family:Courier New">ERD render error: ' + err.message + '</p>';
+      console.error(err);
+    }
+  </script>
+</body>
+</html>
