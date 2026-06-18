@@ -1,0 +1,273 @@
+
+<div id="erd" style="padding: 1rem; background: #050D2A; border-radius: 12px; min-height: 400px;"></div>
+<style>
+body, html { background: #050D2A; }
+#erd svg { max-width: 100%; background: transparent !important; }
+
+#erd svg .er { background: transparent !important; }
+
+#erd svg text { fill: #B0C4DE !important; font-family: 'Courier New', monospace !important; }
+
+#erd svg .entityBox, 
+#erd svg rect.er { 
+  fill: #0A1F5A !important; 
+  stroke: #1E4DB7 !important; 
+  stroke-width: 1.5px !important;
+}
+
+#erd svg .attributeBoxOdd rect,
+#erd svg .row-rect-odd rect,
+#erd svg .row-rect-odd path {
+  fill: #0D2260 !important;
+  stroke: none !important;
+}
+
+#erd svg .attributeBoxEven rect,
+#erd svg .row-rect-even rect,
+#erd svg .row-rect-even path {
+  fill: #091B50 !important;
+  stroke: none !important;
+}
+
+#erd svg .entityLabel text,
+#erd svg .er.entityLabel { 
+  fill: #FFFFFF !important; 
+  font-weight: bold !important;
+}
+
+#erd svg .er.entityHeadingLabel text {
+  fill: #FFFFFF !important;
+  font-weight: bold !important;
+}
+
+#erd svg path.er,
+#erd svg line.er { 
+  stroke: #2A5ABF !important; 
+  stroke-width: 1.5px !important;
+}
+
+#erd svg .er.relationshipLabel { 
+  fill: #42A5F5 !important; 
+  background: #050D2A !important;
+}
+
+#erd svg .er.relationshipLabelBox {
+  fill: #050D2A !important;
+  stroke: none !important;
+  opacity: 0.85 !important;
+}
+
+#erd svg marker path {
+  stroke: #2A5ABF !important;
+  fill: #2A5ABF !important;
+}
+
+#erd svg .er.attributeBoxEven text,
+#erd svg .er.attributeBoxOdd text {
+  fill: #B0C4DE !important;
+}
+
+#erd svg .er[class*="type-"] { fill: #42A5F5 !important; }
+#erd svg .er[class*="PK"],
+#erd svg text[class*="PK"] { fill: #F0C060 !important; font-weight: bold !important; }
+#erd svg .er[class*="FK"],
+#erd svg text[class*="FK"] { fill: #02C39A !important; }
+</style>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Courier New", monospace',
+  themeVariables: {
+    darkMode: true,
+    fontSize: '13px',
+    fontFamily: '"Courier New", monospace',
+    primaryColor: '#0A1F5A',
+    primaryTextColor: '#FFFFFF',
+    primaryBorderColor: '#1E4DB7',
+    secondaryColor: '#0D2260',
+    tertiaryColor: '#091B50',
+    lineColor: '#2A5ABF',
+    textColor: '#B0C4DE',
+    edgeLabelBackground: '#050D2A',
+    attributeBackgroundColorOdd: '#0D2260',
+    attributeBackgroundColorEven: '#091B50',
+    nodeBorder: '#1E4DB7',
+    clusterBkg: '#0A1F5A',
+    titleColor: '#FFFFFF',
+    relationLabelColor: '#42A5F5',
+  },
+});
+
+const diagram = `erDiagram
+  users ||--o{ enrollments : enrolls
+  users ||--o{ course_progress : tracks
+  users ||--o{ quiz_attempts : takes
+  users ||--o{ notifications : receives
+  users ||--o{ certificates : earns
+  users ||--o{ forum_posts : writes
+  courses ||--o{ enrollments : has
+  courses ||--o{ sections : contains
+  courses ||--o{ certificates : issues
+  sections ||--o{ lessons : has
+  lessons ||--o{ course_progress : tracked_by
+  lessons ||--o{ lesson_files : has
+  quizzes ||--o{ quiz_questions : has
+  quizzes ||--o{ quiz_attempts : attempted_in
+  quiz_attempts ||--o{ quiz_answers : includes
+  quiz_questions ||--o{ quiz_answers : answered_by
+
+  users {
+    uuid id PK
+    string full_name
+    string email
+    string role
+    string avatar_url
+    timestamp created_at
+  }
+  courses {
+    uuid id PK
+    uuid instructor_id FK
+    string title
+    string description
+    string thumbnail_url
+    string status
+    decimal price
+    timestamp created_at
+  }
+  sections {
+    uuid id PK
+    uuid course_id FK
+    string title
+    int order_index
+  }
+  lessons {
+    uuid id PK
+    uuid section_id FK
+    string title
+    string type
+    string video_url
+    text content
+    int duration_secs
+    int order_index
+  }
+  lesson_files {
+    uuid id PK
+    uuid lesson_id FK
+    string file_name
+    string file_url
+    string file_type
+  }
+  enrollments {
+    uuid id PK
+    uuid user_id FK
+    uuid course_id FK
+    string status
+    timestamp enrolled_at
+    timestamp completed_at
+  }
+  course_progress {
+    uuid id PK
+    uuid user_id FK
+    uuid lesson_id FK
+    boolean is_completed
+    int watched_secs
+    timestamp last_accessed
+  }
+  quizzes {
+    uuid id PK
+    uuid lesson_id FK
+    string title
+    int pass_score
+    int time_limit_secs
+  }
+  quiz_questions {
+    uuid id PK
+    uuid quiz_id FK
+    string question_text
+    string type
+    json options
+    string correct_answer
+    int marks
+  }
+  quiz_attempts {
+    uuid id PK
+    uuid quiz_id FK
+    uuid user_id FK
+    int score
+    boolean passed
+    timestamp attempted_at
+  }
+  quiz_answers {
+    uuid id PK
+    uuid attempt_id FK
+    uuid question_id FK
+    string given_answer
+    boolean is_correct
+  }
+  certificates {
+    uuid id PK
+    uuid user_id FK
+    uuid course_id FK
+    string cert_url
+    timestamp issued_at
+  }
+  notifications {
+    uuid id PK
+    uuid user_id FK
+    string type
+    string message
+    boolean is_read
+    timestamp created_at
+  }
+  forum_posts {
+    uuid id PK
+    uuid user_id FK
+    uuid lesson_id FK
+    uuid parent_id FK
+    text content
+    timestamp created_at
+  }
+`;
+
+const { svg } = await mermaid.render('erd-svg', diagram);
+document.getElementById('erd').innerHTML = svg;
+
+document.querySelectorAll('#erd svg.erDiagram .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+
+document.querySelectorAll('#erd svg.erDiagram .row-rect-odd path, #erd svg.erDiagram .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+
+const svgEl = document.querySelector('#erd svg');
+if (svgEl) {
+  svgEl.style.background = 'transparent';
+  svgEl.querySelectorAll('rect[class="er"]').forEach(r => {
+    r.style.fill = '#050D2A';
+  });
+  svgEl.querySelectorAll('.entityBox').forEach(box => {
+    box.style.fill = '#0A1F5A';
+    box.style.stroke = '#1E4DB7';
+  });
+}
+</script>
